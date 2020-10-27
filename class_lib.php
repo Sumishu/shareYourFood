@@ -341,12 +341,37 @@ table tr th, table tr td
 { background: #3B3B3B;
   color: #FFF;
   padding: 7px 4px;
-  text-align: left;}
+  text-align: right;}
   
 table tr td
 { background: #E5E5DB;
   color: #47433F;
   border-top: 1px solid #FFF;}
+
+.topnav {
+  overflow: hidden;
+  background-color: #B48A7C;;
+}
+
+.topnav a {
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 107px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.topnav a.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
   </style>
 </head>
 
@@ -356,31 +381,38 @@ table tr td
 	<div id="header">
       <div id="logo">
         <div id="logo_text">
-          <!-- class="logo_colour", allows you to change the colour of the text -->
           <h1><a href="index.html">Share<span class="logo_colour">Your Food</span></a></h1>
         </div>
       </div>
       <div id="menubar">
-        <ul id="menu">
-          <!-- put class="selected" in the li tag for the selected page - to highlight which page you are on -->';
+        <ul id="menu">';
 
 /*____UPDATE HERE____*/
 		if($page=="home")
 			$this->head=$this->head.'<li class="selected"><a href="index.php">Home</a></li>';
 		else
 			$this->head=$this->head.'<li><a href="index.php">Home</a></li>'; 
-          $this->head=$this->head.'<li><a href="index.php">About</a></li>
-          <li><a href="index.php">Contribution</a></li>';
+		if($page=='about')
+			$this->head=$this->head.'<li class="selected"><a href="about.php">About</a></li>';
+		else 
+			$this->head=$this->head.'<li><a href="about.php">About</a></li>';          
+		//$this->head=$this->head.'<li><a href="index.php">Contribution</a></li>';
         if($page=='event')
 			$this->head=$this->head.'<li class="selected"><a href="addevent.php">Events</a></li>';
 		else 
 			$this->head=$this->head.'<li><a href="addevent.php">Events</a></li>';
-          if($page=="login")
-				$this->head=$this->head.'<li class="selected"><a href="login.php">Login</a></li>';
-		  else if($_SESSION["userid"]!="")
-				$this->head=$this->head.'<li><a href="logout.php">Logout'.'</a></li>';
-		  else
-				$this->head=$this->head.'<li><a href="login.php">Login</a></li>';
+		if($page=='profile'){
+			$this->head=$this->head.'<li class="selected"><a href="profile.php">Profile</a></li>';
+		}
+		else{
+			$this->head=$this->head.'<li><a href="profile.php">Profile</a></li>';
+		}
+		if($page=="login")
+			$this->head=$this->head.'<li class="selected"><a href="login.php">Login</a></li>';
+		else if($_SESSION["userid"]!="")
+			$this->head=$this->head.'<li><a href="logout.php">Logout'.'</a></li>';
+		else
+			$this->head=$this->head.'<li><a href="login.php">Login</a></li>';
 		$this->head=$this->head.'
   </ul>
       </div>
@@ -396,6 +428,7 @@ table tr td
           <div class="sidebar_item">
             <!-- insert your sidebar items here -->
 			<p> <pre> 
+
 
 
 
@@ -433,7 +466,7 @@ table tr td
     <div id="footer">';
 	/*___upate here as well___*/
 
-		$this->footer=$this->footer.'<p><a href="index.html">Home</a> | <a href="examples.html">About</a> | <a href="page.html">Contribution</a> | <a href="another_page.html">Event</a> | <a href="contact.html">Sign up</a></p>';
+		$this->footer=$this->footer.'<p><a href="index.php">Home</a> | <a href="about.php">About</a> | <a href="addevent.php">Events</a> | <a href="profile.php">Profile</a> | <a href="login.php">Log in</a></p>';
 		
 		$this->footer=$this->footer.'    </div>
   </div>
@@ -466,6 +499,10 @@ table tr td
 	{
 		$this->body=$this->body.$new_body;
 	}
+	function add($new_body)
+	{
+		$this->body=$this->body.$new_body;
+	}
 	function changeHead($new_head)
 	{
 		$this->head=$new_head;
@@ -479,6 +516,48 @@ table tr td
 	{
 		return $this->head.$this->body.$this->footer;
 	}
+	function check($field)
+	{
+		$words=array('insert','update','delete','remove','select');
+
+		$nn=strtolower($field);
+		$len=sizeof($words);
+		for($i=0;$i<$len;$i++){
+			if (strpos($nn, $words[$i]) !== false)
+				return false;
+		}
+		return true;
+	}
+	
+	function checkmobile($mobile)
+	{
+		if(check($mobile)===false) return false;
+		//echo $mobile;
+		return true;
+		$len=strlen($mobile);
+		if($len!=11)
+			return false;
+		if($mobile[0]!='0') return false;
+		if($mobile[1]!='1') return false;
+		for($i=2;$i<$len;$i++){
+			if($mobile[$i]>='0' && $mobile[$i]<='9') continue;
+			else 
+				return false;
+		}
+		return true;
+	}
+	function checkemail($email)
+	{
+		if(check($email)===false) return false;
+		if (strpos($email, '.') === false)
+				return false;
+		
+		if (strpos($email, '@') === false)
+				return false;
+
+		return true;
+	}
+
 }
 
 
@@ -489,3 +568,35 @@ table tr td
 <p>Side back<img src="https://i.imgur.com/MIfuRLQ.png"></p>	
 */
 ?>
+
+<?php
+/*
+class Database
+{
+	var $servername = "localhost";
+	var $username = "root";
+	var $password = "password";
+	var $dbname = "testdb";
+	var $conn;//=new mysqli($servername, $username, $password, $dbname);
+	
+	function __construct(){
+		$conn = new mysqli($servername, $username, $password, $dbname);
+		if ($conn->connect_error) {
+			die("Connection failed: " . $conn->connect_error);
+		}
+	}
+
+	function query($sql){
+		if ($conn=="" || $conn->connect_error)
+			return null;
+		else 
+			return $conn->query($sql);
+	}
+
+	function close(){
+		$conn->close();	
+	}
+}
+*/
+?>
+
